@@ -5,6 +5,10 @@ class SimpleFile(object):
     def __init__(self, file_path):
         # self = this(in Java)
         self.numbers = []
+        for line in file_path:
+            number_strings = line.split()
+            numbers = [int(n) for n in number_strings]
+            self.numbers.append(numbers)
         """
         TODO: reads the file by path and parse content into two
         dimension array (numbers)
@@ -15,25 +19,40 @@ class SimpleFile(object):
         get_mean retrieves the mean value of the list by line_number (starts
         with zero)
         """
-        pass
+        mean = 0.0
+        for i in range(len(self.numbers[line_number])):
+            mean += self.numbers[line_number][i]
+        mean /= len(self.numbers[line_number])
+        return mean
 
     def get_max(self, line_number):
         """
         get_max retrieves the maximum value of the list by line_number (starts
         with zero)
         """
-        pass
+        max300 = 0.0
+        for i in range(len(self.numbers[line_number])):
+            if self.numbers[line_number][i] > max300:
+                max300 = self.numbers[line_number][i]
+        return max300
 
     def get_min(self, line_number):
         """
         get_min retrieves the minimum value of the list by line_number (starts
         with zero)
         """
-        pass
+        min300 = self.numbers[line_number][0]
+        for i in range(len(self.numbers[line_number])):
+            if self.numbers[line_number][i] < min300:
+                min300 = self.numbers[line_number][i]
+        return min300
 
     def get_sum(self, line_number):
         """
         get_sum retrieves the sumation of the list by line_number (starts with
         zero)
         """
-        pass
+        sums = 0.0
+        for i in range(len(self.numbers[line_number])):
+            sums += self.numbers[line_number][i]
+        return sums
