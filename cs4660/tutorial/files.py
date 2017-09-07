@@ -3,6 +3,7 @@
 class SimpleFile(object):
     """SimpleFile tests using file read api to do some simple math"""
     def __init__(self, file_path):
+        # self = this(in Java)
         self.numbers = []
         """
         TODO: reads the file by path and parse content into two

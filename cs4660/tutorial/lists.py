@@ -25,5 +25,5 @@ def get_avg(li):
     for x in range(0, len(li)):
         v += li[x]
     z = v / len(li)
-    
+
     return z
