@@ -4,10 +4,11 @@ class SimpleFile(object):
     """SimpleFile tests using file read api to do some simple math"""
     def __init__(self, file_path):
         # self = this(in Java)
+        filez = open(file_path)
         self.numbers = []
-        for line in file_path:
-            number_strings = line.split()
-            numbers = [int(n) for n in number_strings]
+        for line in filez:
+            numberline = line.split()
+            numbers = [int(n) for n in numberline]
             self.numbers.append(numbers)
         """
         TODO: reads the file by path and parse content into two
