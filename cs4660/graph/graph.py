@@ -164,6 +164,12 @@ class AdjacencyList(object):
         else:
             return False
 
+    def returnEdge(self, node1, node2):
+        edges = self.adjacency_list[node1.data]
+        for edge in edges:
+            if edge.to_node.data is node2.data:
+                return edge
+
     def distance(self, node_1, node_2):
         pass
 
@@ -221,8 +227,6 @@ class AdjacencyMatrix(object):
         for x in range(len(self.nodes)):
             if self.nodes[x].data is node.data:
                 return False
-            else:
-                pass
         self.nodes.append(node)
 
         copy_matrix = list(self.adjacency_matrix)
@@ -335,6 +339,24 @@ class AdjacencyMatrix(object):
             self.adjacency_matrix[index1][index2] = 0
             return True
 
+    def returnEdge(self, node1, node2):
+        index1 = 0
+        index2 = 0
+        for x in range(len(self.nodes)):
+            if self.nodes[x].data is node1.data:
+                break
+            else:
+                index1 += 1
+        for y in range(len(self.nodes)):
+            if self.nodes[y].data is node2.data:
+                break
+            else:
+                index2 += 1
+        edge = Edge(node1, node2, self.adjacency_matrix[index1][index2])
+        #print edge
+        return edge
+
+
     def __get_node_index(self, node):
         """helper method to find node index"""
         pass
@@ -355,8 +377,6 @@ class AdjacencyMatrix(object):
 
         return self.adjacency_matrix[index1][index2]
 
-    def edgeReturn(self):
-        return Edge(Node(0), Node(0), 1)
 
     def class_name(self):
         return "AM"
