@@ -208,14 +208,14 @@ class AdjacencyMatrix(object):
     def neighbors(self, node):
         neighbors = []
         index = 0
-        for x in range(len(self.nodes)):
-            if self.nodes[x].data == node.data:
+        for x in self.nodes:
+            if x.data is node.data:
                 break
             else:
                 index += 1
         index2 = 0
-        for y in range(len(self.adjacency_matrix[index])):
-            if self.adjacency_matrix[index][y] >= 1:
+        for y in self.adjacency_matrix[index]:
+            if y >= 1:
                 neighbors.append(self.nodes[index2])
                 index2 += 1
             else:

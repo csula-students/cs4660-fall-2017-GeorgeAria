@@ -145,14 +145,11 @@ def dijkstra_search(graph, initial_node, dest_node):
             if nex not in nodeParent:
                 nodeParent[nex] = node
             if nex not in distance:
-                distance[nex] = 0
+                distance[nex] = 999
             alt = distance[node] + graph.returnEdge(node, nex).weight
             if alt < distance[nex]:
                 distance[nex] = alt
                 nodeParent[nex] = node
-                prio.put((distance[nex], nex))
-            else:
-                distance[nex] = graph.returnEdge(node, nex).weight
                 prio.put((distance[nex], nex))
 
     finalList = []

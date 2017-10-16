@@ -24,22 +24,24 @@ STATE_TRANSITION_URL = "http://192.241.218.106:9000/state"
 
 class Edge(object):
     """Edge represents basic unit of graph connecting between two edges"""
-    def __init__(self, from_node, to_node, weight):
+    def __init__(self, from_node, to_node, weight, from_name, to_name):
         self.from_node = from_node
         self.to_node = to_node
         self.weight = weight
+        self.from_name = from_name
+        self.to_name = to_name
     def __str__(self):
-        return 'Edge(from {}, to {}, weight {})'.format(self.from_node, self.to_node, self.weight)
+        return 'Edge(from {}, to {}, weight {}, fromName {}, toName {})'.format(self.from_node, self.to_node, self.weight, self.from_name, self.to_name)
     def __repr__(self):
-        return 'Edge(from {}, to {}, weight {})'.format(self.from_node, self.to_node, self.weight)
+        return 'Edge(from {}, to {}, weight {}, fromName {}, toName {})'.format(self.from_node, self.to_node, self.weight, self.from_name, self.to_name)
 
     def __eq__(self, other_node):
-        return self.from_node == other_node.from_node and self.to_node == other_node.to_node and self.weight == other_node.weight
+        return self.from_node == other_node.from_node and self.to_node == other_node.to_node and self.weight == other_node.weight and self.from_name == other_node.from_name and self.to_name == other_node.to_name
     def __ne__(self, other):
         return not self.__eq__(other)
 
     def __hash__(self):
-        return hash((self.from_node, self.to_node, self.weight))
+        return hash((self.from_node, self.to_node, self.weight, self.from_name, self.to_name))
 
 class ObjectOriented(object):
     """ObjectOriented defines the edges and nodes as both list"""
@@ -107,7 +109,7 @@ def __json_request(target_url, body):
 if __name__ == "__main__":
     # Your code starts here
     empty_room = get_state('7f3dc077574c013d98b2de8f735058b4')
-
+    
     graph = ObjectOriented()
     q = Queue.Queue()
     q.put(empty_room)
@@ -120,7 +122,7 @@ if __name__ == "__main__":
     while not q.empty():
         current = q.get()
 
-        if current['location']['name'] == "Dark Room":
+        if current['location']['name'] == "Dark Room" and current['id'] == "f1f131f647621a4be7c71292e79613f9":
             endNode = current['id']
             break
 
@@ -128,12 +130,9 @@ if __name__ == "__main__":
             new_room = get_state(x['id'])
             if new_room['id'] not in nodeParent:
                 nodeParent[new_room['id']] = current['id']
-                edge = Edge(current['id'], x['id'], transition_state(current['id'], x['id'])['event']['effect'])
+                edge = Edge(current['id'], x['id'], transition_state(current['id'], x['id'])['event']['effect'], current['location']['name'], x['location']['name'])
                 graph.edges.append(edge)
                 q.put(new_room)
-            if new_room['location']['name'] == "Dark Room":
-                endNode = current['id']
-                break
 
     finalList = []
 
@@ -141,14 +140,63 @@ if __name__ == "__main__":
         finalList.append(graph.returnEdge(nodeParent[endNode], endNode))
         endNode = nodeParent[endNode]
     finalList.reverse()
-    print("BFS")
-    print("Path to get to Dark Room")
+
+    hp = 0
+    print("BFS Path:")
     for x in finalList:
-        print(x)
+        print(x.from_name + "(" + str(x.from_node) + ") : " + x.to_name + "(" + str(x.to_node) + "): " + str(x.weight))
+        hp += x.weight
+    print("Total HP: " + str(hp))
 
-    print()
-    print("DFS not implemented")
+    print(" ")
 
+    graph2 = ObjectOriented()
+
+    distance = {}
+    nodeP = {}
+    distance[empty_room['id']] = 0
+    nodeP[empty_room['id']] = None
+
+    q2 = Queue.PriorityQueue()
+    q2.put((distance[empty_room['id']], empty_room))
+
+    fina = None
+
+    while not q2.empty():
+        cur = q2.get()[1]
+        print(q2.qsize())
+
+        if cur['location']['name'] == "Dark Room" and cur['id'] == "f1f131f647621a4be7c71292e79613f9":
+            fina = cur['id']
+            break
+        for x in cur['neighbors']:
+            new_r = get_state(x['id'])
+            if new_r['id'] not in nodeP:
+                nodeP[new_r['id']] = cur['id']
+            if new_r['id'] not in distance:
+                distance[new_r['id']] = 999
+            edge = Edge(cur['id'], x['id'], transition_state(cur['id'], new_r['id'])['event']['effect'], cur['location']['name'], new_r['location']['name'])
+            graph2.edges.append(edge)
+
+            alt = distance[cur['id']] + edge.weight
+
+            if alt < distance[new_r['id']]:
+                distance[new_r['id']] = alt
+                nodeP[new_r['id']] = cur['id']
+                q2.put((distance[new_r['id']], new_r))
+
+    finalL = []
+    while nodeP[fina] is not None:
+        finalL.append(graph2.returnEdge(nodeP[fina], fina))
+        fina = nodeP[fina]
+    finalL.reverse()
+
+    hp = 0
+    print("DFS Path:")
+    for x in finalL:
+        print(x.from_name + "(" + str(x.from_node) + ") : " + x.to_name + "(" + str(x.to_node) + "): " + str(x.weight))
+        hp += x.weight
+    print("Total HP: " + str(hp))
 
     #print(empty_room['neighbors'])
     #print(empty_room['id'])
