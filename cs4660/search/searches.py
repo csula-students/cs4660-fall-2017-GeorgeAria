@@ -2,6 +2,7 @@
 Searches module defines all different search algorithms
 """
 import Queue
+import math
 
 def bfs(graph, initial_node, dest_node):
     """
@@ -172,19 +173,20 @@ def a_star_search(graph, initial_node, dest_node):
     costSoFar[initial_node] = 0
 
     prio = Queue.PriorityQueue()
-    prio.put(0, initial_node)
+    prio.put((0, initial_node))
 
     fina = None
 
     while not prio.empty():
         node = prio.get()[1]
 
-        if node.data is dest_node.data:
+        if node.data.x is dest_node.data.x and node.data.y is dest_node.data.y and node.data.symbol is dest_node.data.symbol:
             fina = node
             break
         for nex in graph.neighbors(node):
             newCost = costSoFar[node] + graph.returnEdge(node, nex).weight
             if next not in costSoFar or newCost < costSoFar[nex]:
                 costSoFar[next] = newCost
-                prio.put(next, newCost)
+                priorityNum = newCost + abs(node.data.x - next.data.x) + abs(node.data.y - next.data.y)
+                prio.put((next, priorityNum))
                 nodeParent[nex] = node
