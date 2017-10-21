@@ -165,4 +165,26 @@ def a_star_search(graph, initial_node, dest_node):
     uses graph to do search from the initial_node to dest_node
     returns a list of actions going from the initial node to dest_node
     """
-    pass
+
+    nodeParent = {}
+    costSoFar = {}
+    nodeParent[initial_node] = None
+    costSoFar[initial_node] = 0
+
+    prio = Queue.PriorityQueue()
+    prio.put(0, initial_node)
+
+    fina = None
+
+    while not prio.empty():
+        node = prio.get()[1]
+
+        if node.data is dest_node.data:
+            fina = node
+            break
+        for nex in graph.neighbors(node):
+            newCost = costSoFar[node] + graph.returnEdge(node, nex).weight
+            if next not in costSoFar or newCost < costSoFar[nex]:
+                costSoFar[next] = newCost
+                prio.put(next, newCost)
+                nodeParent[nex] = node

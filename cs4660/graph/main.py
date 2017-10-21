@@ -109,7 +109,7 @@ def __json_request(target_url, body):
 if __name__ == "__main__":
     # Your code starts here
     empty_room = get_state('7f3dc077574c013d98b2de8f735058b4')
-    
+    '''
     graph = ObjectOriented()
     q = Queue.Queue()
     q.put(empty_room)
@@ -149,49 +149,72 @@ if __name__ == "__main__":
     print("Total HP: " + str(hp))
 
     print(" ")
-
+    '''
     graph2 = ObjectOriented()
 
     distance = {}
     nodeP = {}
+    numPrio = {}
     distance[empty_room['id']] = 0
     nodeP[empty_room['id']] = None
+    numPrio[empty_room['id']] = 1
+    visited = []
+    finaDist = -999
 
     q2 = Queue.PriorityQueue()
-    q2.put((distance[empty_room['id']], empty_room))
+    q2.put((numPrio[empty_room['id']], empty_room))
 
-    fina = None
+    fina = "f1f131f647621a4be7c71292e79613f9"
+    finalL = []
 
     while not q2.empty():
         cur = q2.get()[1]
-        print(q2.qsize())
 
         if cur['location']['name'] == "Dark Room" and cur['id'] == "f1f131f647621a4be7c71292e79613f9":
+            dist = 0
+            testL = []
+            while nodeP[fina] is not None:
+                dist += graph2.returnEdge(nodeP[fina], fina).weight
+                testL.append(graph2.returnEdge(nodeP[fina], fina))
+                fina = nodeP[fina]
+            testL.reverse()
+
+            if dist > finaDist:
+                finaDist = dist
+                finalL = testL
+            print(dist)
             fina = cur['id']
-            break
+            continue
+
+        if cur['id'] in visited:
+            continue
+
         for x in cur['neighbors']:
             new_r = get_state(x['id'])
-            if new_r['id'] not in nodeP:
-                nodeP[new_r['id']] = cur['id']
+            if new_r['id'] in visited:
+                continue
+            if new_r['id'] not in numPrio:
+                numPrio[new_r['id']] = 1.0
+            # if new_r['id'] not in nodeP:
+            # nodeP[new_r['id']] = cur['id']
             if new_r['id'] not in distance:
-                distance[new_r['id']] = 999
-            edge = Edge(cur['id'], x['id'], transition_state(cur['id'], new_r['id'])['event']['effect'], cur['location']['name'], new_r['location']['name'])
-            graph2.edges.append(edge)
+                distance[new_r['id']] = -999
+            edge = Edge(cur['id'], new_r['id'], transition_state(cur['id'], new_r['id'])['event']['effect'],
+                        cur['location']['name'], new_r['location']['name'])
 
             alt = distance[cur['id']] + edge.weight
 
-            if alt < distance[new_r['id']]:
+            if alt >= distance[new_r['id']]:
+                graph2.edges.append(edge)
                 distance[new_r['id']] = alt
                 nodeP[new_r['id']] = cur['id']
-                q2.put((distance[new_r['id']], new_r))
-
-    finalL = []
-    while nodeP[fina] is not None:
-        finalL.append(graph2.returnEdge(nodeP[fina], fina))
-        fina = nodeP[fina]
-    finalL.reverse()
+                numPrio[new_r['id']] /= 2
+                q2.put((numPrio[new_r['id']], new_r))
+        visited.append(cur['id'])
 
     hp = 0
+
+    print(len(visited))
     print("DFS Path:")
     for x in finalL:
         print(x.from_name + "(" + str(x.from_node) + ") : " + x.to_name + "(" + str(x.to_node) + "): " + str(x.weight))

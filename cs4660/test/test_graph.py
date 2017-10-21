@@ -1,6 +1,7 @@
 """test_graph tests the graph implementation"""
 
 import unittest
+import math
 
 from graph import graph
 
